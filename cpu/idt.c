@@ -7,7 +7,7 @@ void idt_set_gate(int n, uint32_t handler)
 {
     idt[n].isr_low    = (uint16_t)(handler & 0xFFFF);
     idt[n].isr_high   = (uint16_t)((handler >> 16) & 0xFFFF);
-    idt[n].kernel_cs  = 0x08;  
+    idt[n].kernel_cs  = 0x08;
     idt[n].reserved   = 0x00;
     idt[n].attributes = 0x8E;
 }
@@ -21,9 +21,9 @@ void idt_init(void)
         idt[i].reserved   = 0;
         idt[i].attributes = 0;
     }
- 
+
     idtr.limit = (uint16_t)(sizeof(idt_entry_t) * IDT_ENTRIES - 1);
-    idtr.base  = (uint64_t)(uintptr_t)idt;
+    idtr.base  = (uint32_t)idt;   /* 32-bit base */
 
     __asm__ volatile ("lidt %0" : : "m"(idtr));
 }

@@ -1,5 +1,5 @@
 #include "isr.h"
-#include <stddef.h>
+#include "idt.h"
 
 /* Human-readable names for the 32 CPU exception vectors */
 static const char *exception_messages[32] = {
@@ -43,14 +43,33 @@ void isr_init(void)
         idt_set_gate(i, isr_stub_table[i]);
 }
 
+static void panic_print(const char *msg)
+{
+    volatile unsigned short *vga = (volatile unsigned short *)0xB8000;
+    unsigned char color = 0x4F; 
+ 
+
+    for (int i = 0; i < 80; i++)
+        vga[i] = (unsigned short)(color << 8 | ' ');
+ 
+    const char *prefix = "EXCEPTION: ";
+    for (int i = 0; prefix[i]; i++)
+        vga[i] = (unsigned short)(color << 8 | (unsigned char)prefix[i]);
+ 
+    
+    int col = 11;
+    for (int i = 0; msg[i] && col < 80; i++, col++)
+        vga[col] = (unsigned short)(color << 8 | (unsigned char)msg[i]);
+}
+
 
 void exception_handler(registers_t *regs)
 {
-    if (regs->int_no < 32) {
-        /* TODO: replace with your kernel's panic / logging function */
-        (void)exception_messages[regs->int_no];
-
-        /* Halt — unhandled CPU exceptions are unrecoverable */
+    const char *msg = (regs->int_no < 32) ? exception_messages[regs->int_no] : "Unknown Exception";
+ 
+    panic_print(msg);
+ 
+    while(1) {
         __asm__ volatile ("cli; hlt");
     }
 }

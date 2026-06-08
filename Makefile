@@ -61,17 +61,7 @@ $(BUILD_DIR)/isr.o: $(CPU_DIR)/isr.c
 
 $(BUILD_DIR)/isr_asm.o: $(CPU_DIR)/isr.asm
 	$(ASM) -f elf32 $(CPU_DIR)/isr.asm -o $(BUILD_DIR)/isr_asm.o
-
-#$(BUILD_DIR)/pic.o: $(CPU_DIR)/pic.c
-	$(CC) $(CFLAGS) -c $(CPU_DIR)/pic.c -o $(BUILD_DIR)/pic.o
-
-#$(BUILD_DIR)/irq.o: $(CPU_DIR)/irq.c
-	$(CC) $(CFLAGS) -c $(CPU_DIR)/irq.c -o $(BUILD_DIR)/irq.o
-
-#$(BUILD_DIR)/irq_asm.o: $(CPU_DIR)/irq.asm
-	$(ASM) -f elf32 $(CPU_DIR)/irq.asm -o $(BUILD_DIR)/irq_asm.o
-
-# ─────────────────────────────────────────────────────────────────────────────
+#─────────────────────────────────────────────────────────────────────────────
 # Link kernel binary
 # ─────────────────────────────────────────────────────────────────────────────
 $(BUILD_DIR)/kernel.bin: $(BUILD_DIR)/entry.o    \

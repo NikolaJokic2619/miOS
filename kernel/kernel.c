@@ -18,15 +18,10 @@ void kernel_main()
     
     print("\n");
     
-    
 /*-----------------------------------*/
-    __asm__ volatile ("sti");
-    print("IDT loaded. Interrupts enabled.\n");
    
-    int x = 0;
-    print("test\n");
-    int y = 1/x;
-    print("interrupts do not work!!!");   
+    __asm__ volatile ("div %0" : : "r"(0));
+    print("THIS SHOULD NEVER PRINT\n");  
     
 /*-----------------------------------*/
 
