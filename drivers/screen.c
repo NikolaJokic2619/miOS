@@ -11,10 +11,10 @@ static int get_screen_offset(int col, int row)
 int get_cursor()
 {
     int offset = 0;
-    port_byte_out(REG_SCREEN_CTRL, 14);
-    offset = port_byte_in(REG_SCREEN_DATA) << 8;
-    port_byte_out(REG_SCREEN_CTRL, 15);
-    offset |= port_byte_in(REG_SCREEN_DATA);
+    outb(REG_SCREEN_CTRL, 14);
+    offset = inb(REG_SCREEN_DATA) << 8;
+    outb(REG_SCREEN_CTRL, 15);
+    offset |= inb(REG_SCREEN_DATA);
     
     return offset * 2;
 }
@@ -64,10 +64,10 @@ int handle_scrolling(int cursor_offset)
 void set_cursor(int offset) 
 {
     offset /= 2;
-    port_byte_out(REG_SCREEN_CTRL, 14);
-    port_byte_out(REG_SCREEN_DATA, (unsigned char)(offset >> 8));
-    port_byte_out(REG_SCREEN_CTRL, 15);
-    port_byte_out(REG_SCREEN_DATA, (unsigned char)(offset & 0xff));
+    outb(REG_SCREEN_CTRL, 14);
+    outb(REG_SCREEN_DATA, (unsigned char)(offset >> 8));
+    outb(REG_SCREEN_CTRL, 15);
+    outb(REG_SCREEN_DATA, (unsigned char)(offset & 0xff));
 }
 
 

@@ -1,6 +1,7 @@
 #include "../drivers/screen.h"
 #include "../cpu/idt.h"
 #include "../cpu/isr.h"
+#include "../cpu/pic.h"
 
 void kernel_main()
 {
@@ -9,7 +10,7 @@ void kernel_main()
 
     idt_init(); 
     isr_init();   
-
+    PIC_remap(0x20, 0x28);
 /*-----------------------------------*/
     
     print("Nikola Jokic");
@@ -20,8 +21,8 @@ void kernel_main()
     
 /*-----------------------------------*/
    
-    __asm__ volatile ("div %0" : : "r"(0));
-    print("THIS SHOULD NEVER PRINT\n");  
+    //__asm__ volatile ("div %0" : : "r"(0));
+    //print("THIS SHOULD NEVER PRINT\n");  
     
 /*-----------------------------------*/
 

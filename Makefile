@@ -61,6 +61,9 @@ $(BUILD_DIR)/isr.o: $(CPU_DIR)/isr.c
 
 $(BUILD_DIR)/isr_asm.o: $(CPU_DIR)/isr.asm
 	$(ASM) -f elf32 $(CPU_DIR)/isr.asm -o $(BUILD_DIR)/isr_asm.o
+
+$(BUILD_DIR)/pic.o: $(CPU_DIR)/pic.c
+	$(CC) $(CFLAGS) -c $(CPU_DIR)/pic.c -o $(BUILD_DIR)/pic.o
 #─────────────────────────────────────────────────────────────────────────────
 # Link kernel binary
 # ─────────────────────────────────────────────────────────────────────────────
@@ -70,7 +73,7 @@ $(BUILD_DIR)/kernel.bin: $(BUILD_DIR)/entry.o    \
                           $(BUILD_DIR)/idt.o      \
                           $(BUILD_DIR)/isr.o      \
                           $(BUILD_DIR)/isr_asm.o  \
-                          
+                          $(BUILD_DIR)/pic.o
 	$(LD) -m elf_i386 -Ttext=0x1000 --oformat binary $^ -o $@
 
 # ─────────────────────────────────────────────────────────────────────────────

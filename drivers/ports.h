@@ -1,32 +1,40 @@
 #ifndef PORTS_H
 #define PORTS_H
 
+#include <stdint.h>
+
 /* Read one byte from an I/O port. */
-static inline unsigned char port_byte_in(unsigned short port)
+static inline uint8_t inb(uint16_t port)
 {
-    unsigned char result;
+    uint8_t result;
     __asm__ volatile ("inb %1, %0" : "=a"(result) : "Nd"(port));
     return result;
 }
 
 /* Write one byte to an I/O port. */
-static inline void port_byte_out(unsigned short port, unsigned char data)
+static inline void outb(uint16_t port, uint8_t data)
 {
     __asm__ volatile ("outb %0, %1" : : "a"(data), "Nd"(port));
 }
 
-/* Read one word (2 bytes) from an I/O port. */
-static inline unsigned short port_word_in(unsigned short port)
+/* Read one word from an I/O port. */
+static inline uint16_t inw(uint16_t port)
 {
-    unsigned short result;
+    uint16_t result;
     __asm__ volatile ("inw %1, %0" : "=a"(result) : "Nd"(port));
     return result;
 }
 
-/* Write one word (2 bytes) to an I/O port. */
-static inline void port_word_out(unsigned short port, unsigned short data)
+/* Write one word to an I/O port. */
+static inline void outw(uint16_t port, uint16_t data)
 {
     __asm__ volatile ("outw %0, %1" : : "a"(data), "Nd"(port));
 }
 
-#endif /* PORTS_H */
+/* Small delay for old hardware/PIC commands. */
+static inline void io_wait(void)
+{
+    outb(0x80, 0);
+}
+
+#endif
