@@ -1,14 +1,16 @@
 #include "../drivers/screen.h"
-#include "../drivers/keyboard.h"
+#include "../cpu/idt.h"
 #include "../cpu/isr.h"
 
 void kernel_main()
 {
-    isr_install();
     clear_screen();
+/*-----------------------------------*/
+
+    idt_init(); 
+    isr_init();   
 
 /*-----------------------------------*/
- 
     
     print("Nikola Jokic");
     
@@ -18,10 +20,16 @@ void kernel_main()
     
     
 /*-----------------------------------*/
-    
-    
-    keyboard_install();
-    print("Keyboard ready\n");
+    __asm__ volatile ("sti");
+    print("IDT loaded. Interrupts enabled.\n");
    
+    int x = 0;
+    print("test\n");
+    int y = 1/x;
+    print("interrupts do not work!!!");   
+    
+/*-----------------------------------*/
+
+                    
     while(1) {}
 }
