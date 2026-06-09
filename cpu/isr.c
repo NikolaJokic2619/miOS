@@ -1,5 +1,6 @@
 #include "isr.h"
 #include "idt.h"
+#include "../drivers/screen.h"
 
 /* Human-readable names for the 32 CPU exception vectors */
 static const char *exception_messages[32] = {
@@ -43,31 +44,33 @@ void isr_init(void)
         idt_set_gate(i, isr_stub_table[i]);
 }
 
-static void panic_print(const char *msg)
-{
-    volatile unsigned short *vga = (volatile unsigned short *)0xB8000;
-    unsigned char color = 0x4F; 
- 
-
-    for (int i = 0; i < 80; i++)
-        vga[i] = (unsigned short)(color << 8 | ' ');
- 
-    const char *prefix = "EXCEPTION: ";
-    for (int i = 0; prefix[i]; i++)
-        vga[i] = (unsigned short)(color << 8 | (unsigned char)prefix[i]);
- 
-    
-    int col = 11;
-    for (int i = 0; msg[i] && col < 80; i++, col++)
-        vga[col] = (unsigned short)(color << 8 | (unsigned char)msg[i]);
-}
-
 
 void exception_handler(registers_t *regs)
 {
     const char *msg = (regs->int_no < 32) ? exception_messages[regs->int_no] : "Unknown Exception";
  
-    panic_print(msg);
+    clear_screen();
+    print("**********KERNEL PANIC**********\n");
+    print(msg);
+    
+    if(regs->int_no == 14)
+    {
+        uint32_t address_of_error;
+        __asm__ volatile ("mov %%cr2, %0" : "=r"(address_of_error));
+        print(" at address 0x");
+        
+        char hex_str[9];
+        const char *hex = "0123456789ABCDEF";
+        
+        for(int i = 0; i < 8; i++)
+        {
+            hex_str[7 - i] = (hex[address_of_error & 0xF]);
+            address_of_error >>= 4;
+        }
+        
+        hex_str[8] = '\n';
+        print(hex_str);
+    }
  
     while(1) {
         __asm__ volatile ("cli; hlt");
