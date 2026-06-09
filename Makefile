@@ -10,7 +10,8 @@ CPU_DIR     = cpu
 BUILD_DIR   = build
 
 # Compiler flags shared across all C files
-CFLAGS = -ffreestanding -fno-pic -nostdlib -I$(DRIVERS_DIR) -I$(CPU_DIR)
+# Included "." so relative paths like "../drivers/ports.h" resolve perfectly from any directory
+CFLAGS = -ffreestanding -fno-pic -nostdlib -I. -I$(DRIVERS_DIR) -I$(CPU_DIR) -Wall -Wextra
 
 # ─────────────────────────────────────────────────────────────────────────────
 # Top-level targets
@@ -50,6 +51,10 @@ $(BUILD_DIR)/kernel.o: $(KERNEL_DIR)/kernel.c
 $(BUILD_DIR)/screen.o: $(DRIVERS_DIR)/screen.c
 	$(CC) $(CFLAGS) -c $(DRIVERS_DIR)/screen.c -o $(BUILD_DIR)/screen.o
 
+# FIXED: Changed target from screen.o to keyboard.o
+$(BUILD_DIR)/keyboard.o: $(DRIVERS_DIR)/keyboard.c
+	$(CC) $(CFLAGS) -c $(DRIVERS_DIR)/keyboard.c -o $(BUILD_DIR)/keyboard.o
+
 # ─────────────────────────────────────────────────────────────────────────────
 # CPU objects
 # ─────────────────────────────────────────────────────────────────────────────
@@ -64,16 +69,30 @@ $(BUILD_DIR)/isr_asm.o: $(CPU_DIR)/isr.asm
 
 $(BUILD_DIR)/pic.o: $(CPU_DIR)/pic.c
 	$(CC) $(CFLAGS) -c $(CPU_DIR)/pic.c -o $(BUILD_DIR)/pic.o
-#─────────────────────────────────────────────────────────────────────────────
+	
+$(BUILD_DIR)/irq_asm.o: $(CPU_DIR)/irq.asm
+	$(ASM) -f elf32 $(CPU_DIR)/irq.asm -o $(BUILD_DIR)/irq_asm.o
+	
+$(BUILD_DIR)/irq.o: $(CPU_DIR)/irq.c
+	$(CC) $(CFLAGS) -c $(CPU_DIR)/irq.c -o $(BUILD_DIR)/irq.o
+
+$(BUILD_DIR)/timer.o: $(CPU_DIR)/timer.c
+	$(CC) $(CFLAGS) -c $(CPU_DIR)/timer.c -o $(BUILD_DIR)/timer.o
+# ─────────────────────────────────────────────────────────────────────────────
 # Link kernel binary
 # ─────────────────────────────────────────────────────────────────────────────
+# Notice: entry.o stays at the very top so execution hits your setup assembly entry first!
 $(BUILD_DIR)/kernel.bin: $(BUILD_DIR)/entry.o    \
                           $(BUILD_DIR)/kernel.o   \
                           $(BUILD_DIR)/screen.o   \
+                          $(BUILD_DIR)/keyboard.o \
                           $(BUILD_DIR)/idt.o      \
                           $(BUILD_DIR)/isr.o      \
                           $(BUILD_DIR)/isr_asm.o  \
-                          $(BUILD_DIR)/pic.o
+                          $(BUILD_DIR)/pic.o      \
+                          $(BUILD_DIR)/irq.o      \
+                          $(BUILD_DIR)/timer.o  \
+                          $(BUILD_DIR)/irq_asm.o
 	$(LD) -m elf_i386 -Ttext=0x1000 --oformat binary $^ -o $@
 
 # ─────────────────────────────────────────────────────────────────────────────
