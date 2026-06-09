@@ -1,5 +1,5 @@
 [bits 32]
-[extern exception_handler]    ; must be at the top, matches isr.c
+[extern exception_handler] 
 
 ;--------------------------------------------------------------------------
 ; Common stub — all ISR stubs jump here after pushing vector + error code.
@@ -21,7 +21,7 @@
 
 %macro isr_no_err_stub 1
 isr_stub_%1:
-    push dword 0        ; dummy error code
+    push dword 0
     push dword %1       ; vector number
     jmp isr_common_stub
 %endmacro

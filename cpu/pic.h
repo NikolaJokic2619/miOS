@@ -10,12 +10,7 @@
 #define PIC2_COMMAND	PIC2    /* 0xA0 - Slave PIC command */
 #define PIC2_DATA	(PIC2+1)    /* 0xA1 - Slave PIC data */
 
-#define PIC_EOI		0x20		/* End-of-interrupt command */
-
-
-
-/* reinitialize the PIC controllers, giving them specified vector offsets
-   rather than 8h and 70h, as configured by default */
+#define PIC_EOI		0x20		/* EOI command */
 
 #define ICW1_ICW4	0x01		/* Indicates that ICW4 will be present */
 #define ICW1_SINGLE	0x02		/* Single (cascade) mode */
@@ -30,13 +25,6 @@
 #define ICW4_SFNM	0x10		/* Special fully nested (not) */
 
 #define CASCADE_IRQ 2
-
-/*
-arguments:
-	offset1 - vector offset for master PIC
-		vectors on the master become offset1..offset1+7
-	offset2 - same for slave PIC: offset2..offset2+7
-*/
 
 void PIC_sendEOI(uint8_t irq);
 void PIC_remap(int offset1, int offset2);

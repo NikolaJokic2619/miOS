@@ -2,6 +2,9 @@
 #include "../cpu/idt.h"
 #include "../cpu/isr.h"
 #include "../cpu/pic.h"
+#include "../cpu/irq.h"
+#include "../cpu/timer.h"
+#include "../drivers/keyboard.h"
 
 void kernel_main()
 {
@@ -11,6 +14,9 @@ void kernel_main()
     idt_init(); 
     isr_init();   
     PIC_remap(0x20, 0x28);
+    irq_init();
+    timer_init(100);
+    keyboard_init();
 /*-----------------------------------*/
     
     print("Nikola Jokic");
@@ -24,6 +30,16 @@ void kernel_main()
     //__asm__ volatile ("div %0" : : "r"(0));
     //print("THIS SHOULD NEVER PRINT\n");  
     
+/*-----------------------------------*/
+
+    __asm__ volatile("sti");
+    
+/*-----------------------------------*/
+
+    print("waiting 5 seconds...\n");
+    timer_sleep(5);
+    print("done!\n");
+
 /*-----------------------------------*/
 
                     
