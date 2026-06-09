@@ -82,18 +82,20 @@ $(BUILD_DIR)/timer.o: $(CPU_DIR)/timer.c
 # Link kernel binary
 # ─────────────────────────────────────────────────────────────────────────────
 # Notice: entry.o stays at the very top so execution hits your setup assembly entry first!
-$(BUILD_DIR)/kernel.bin: $(BUILD_DIR)/entry.o    \
-                          $(BUILD_DIR)/kernel.o   \
-                          $(BUILD_DIR)/screen.o   \
-                          $(BUILD_DIR)/keyboard.o \
-                          $(BUILD_DIR)/idt.o      \
-                          $(BUILD_DIR)/isr.o      \
-                          $(BUILD_DIR)/isr_asm.o  \
-                          $(BUILD_DIR)/pic.o      \
-                          $(BUILD_DIR)/irq.o      \
-                          $(BUILD_DIR)/timer.o  \
-                          $(BUILD_DIR)/irq_asm.o
-	$(LD) -m elf_i386 -Ttext=0x1000 --oformat binary $^ -o $@
+KERNEL_OBJS = $(BUILD_DIR)/entry.o    \
+              $(BUILD_DIR)/kernel.o   \
+              $(BUILD_DIR)/screen.o   \
+              $(BUILD_DIR)/keyboard.o \
+              $(BUILD_DIR)/idt.o      \
+              $(BUILD_DIR)/isr.o      \
+              $(BUILD_DIR)/isr_asm.o  \
+              $(BUILD_DIR)/pic.o      \
+              $(BUILD_DIR)/irq.o      \
+              $(BUILD_DIR)/timer.o    \
+              $(BUILD_DIR)/irq_asm.o
+
+$(BUILD_DIR)/kernel.bin: $(KERNEL_OBJS) $(KERNEL_DIR)/linker.ld
+	$(LD) -m elf_i386 -T $(KERNEL_DIR)/linker.ld --oformat binary $(KERNEL_OBJS) -o $@
 
 # ─────────────────────────────────────────────────────────────────────────────
 # Run / debug
