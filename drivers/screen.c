@@ -92,18 +92,36 @@ void print_char(char character, int col, int row, char attribute_byte)
         offset = get_cursor();
     }
     
+    
+    
     if(character == '\n')
     {
         int rows = offset / (2 * MAX_COLS);
         offset = get_screen_offset(MAX_COLS - 1, rows);
     }
     else if(character == '\b')
-    {
+    {   
         if(offset > 0)
-        {
+        {   
             offset -= 2;
-            vidmem[offset] = ' ';
-        }    
+            
+            if(vidmem[offset] == ' ')
+            {
+                int i = 1;
+                while(offset > 0 && vidmem[offset] == ' ' && i < 80)
+                {
+                    offset -= 2;
+                    i++;
+                    
+                }
+            
+                if(vidmem[offset] != ' ')
+                    offset += 2;
+            }
+            else
+                vidmem[offset] = ' ';
+        }
+        
         offset -= 2;
         
     }
